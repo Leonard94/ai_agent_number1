@@ -3,7 +3,7 @@ import { Layout, Row, Col, Space, ConfigProvider, theme } from "antd";
 import { AppHeader } from "../Header/Header";
 import { RequirementInput } from "../RequirementInput/RequirementInput";
 import "./App.scss";
-import type { ChatMessage, RequirementAnalysis } from "../../types";
+import type { ChatMessage, RequirementAnalysisWithTodos } from "../../types";
 import { TodoCard } from "../AnalysisResults/TodoCard/TodoCard";
 import { QuestionsCard } from "../AnalysisResults/QuestionsCard/QuestionsCard";
 import { Chat } from "../Chat/Chat";
@@ -15,7 +15,9 @@ const { Content } = Layout;
 
 export const App: React.FC = () => {
   const [requirement, setRequirement] = useState<string>("");
-  const [analysis, setAnalysis] = useState<RequirementAnalysis | null>(null);
+  const [analysis, setAnalysis] = useState<RequirementAnalysisWithTodos | null>(
+    null
+  );
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
@@ -39,6 +41,17 @@ export const App: React.FC = () => {
     } finally {
       setIsAnalyzing(false);
     }
+  };
+
+  const handleToggleTodo = (todoId: string) => {
+    if (!analysis) return;
+
+    setAnalysis({
+      ...analysis,
+      todoList: analysis.todoList.map((todo) =>
+        todo.id === todoId ? { ...todo, completed: !todo.completed } : todo
+      ),
+    });
   };
 
   const sendChatMessage = async () => {
@@ -126,7 +139,11 @@ export const App: React.FC = () => {
                       todoCount={analysis.todoList.length}
                       questionsCount={analysis.questions.length}
                     />
-                    <TodoCard todoList={analysis.todoList} />
+                    {/* ИЗМЕНЕНО: Передаем новые пропсы в TodoCard */}
+                    <TodoCard
+                      todoList={analysis.todoList}
+                      onToggleTodo={handleToggleTodo}
+                    />
                     <QuestionsCard questions={analysis.questions} />
                   </Space>
                 </Col>

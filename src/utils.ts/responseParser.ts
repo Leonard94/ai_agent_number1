@@ -1,4 +1,5 @@
-import type { RequirementAnalysis } from "../types";
+import type { RequirementAnalysisWithTodos, TodoItem } from "../types";
+import { v4 as uuidv4 } from "uuid";
 
 export const parseTldr = (response: string): string => {
   const tldrMatch = response.match(
@@ -9,13 +10,19 @@ export const parseTldr = (response: string): string => {
   return tldr || "Не удалось извлечь краткое описание";
 };
 
-export const parseTodoList = (response: string): string[] => {
+export const parseTodoList = (response: string): TodoItem[] => {
   const todoSectionMatch = response.match(
     /\*\*TODO:\*\*\s*\n?([\s\S]*?)(?=\n\*\*ВОПРОСЫ:\*\*|$)/i
   );
 
   if (!todoSectionMatch) {
-    return ["Не удалось извлечь технические задачи"];
+    return [
+      {
+        id: uuidv4(),
+        text: "Не удалось извлечь технические задачи",
+        completed: false,
+      },
+    ];
   }
 
   const todoText = todoSectionMatch[1];
@@ -24,11 +31,22 @@ export const parseTodoList = (response: string): string[] => {
     .map((line) => line.trim())
     .filter((line) => line.startsWith("- "))
     .map((line) => line.replace(/^- /, ""))
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((text) => ({
+      id: uuidv4(),
+      text,
+      completed: false,
+    }));
 
   return todoList.length > 0
     ? todoList
-    : ["Не удалось извлечь технические задачи"];
+    : [
+        {
+          id: uuidv4(),
+          text: "Не удалось извлечь технические задачи",
+          completed: false,
+        },
+      ];
 };
 
 export const parseQuestions = (response: string): string[] => {
@@ -51,11 +69,13 @@ export const parseQuestions = (response: string): string[] => {
   return questions.length > 0 ? questions : ["Не удалось извлечь вопросы"];
 };
 
-export const parseAiResponse = (response: string): RequirementAnalysis => {
+export const parseAiResponse = (
+  response: string
+): RequirementAnalysisWithTodos => {
   console.log("=== ПАРСИНГ ОТВЕТА МОДЕЛИ ===");
   console.log("Исходный ответ:", response);
 
-  const result: RequirementAnalysis = {
+  const result: RequirementAnalysisWithTodos = {
     tldr: parseTldr(response),
     todoList: parseTodoList(response),
     questions: parseQuestions(response),

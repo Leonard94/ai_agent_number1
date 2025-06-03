@@ -4,6 +4,18 @@ export interface RequirementAnalysis {
   questions: string[];
 }
 
+export interface TodoItem {
+  id: string;
+  text: string;
+  completed: boolean;
+}
+
+export interface RequirementAnalysisWithTodos {
+  tldr: string;
+  todoList: TodoItem[];
+  questions: string[];
+}
+
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
