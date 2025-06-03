@@ -97,11 +97,11 @@ export interface UseAnalysisReturn {
   clearAnalysis: () => void;
 }
 
-export interface UseChatReturn {
-  chatMessages: ChatMessage[];
-  currentMessage: string;
-  isChatting: boolean;
-  setCurrentMessage: (value: string) => void;
-  sendMessage: () => Promise<void>;
-  clearChat: () => void;
+export interface ApiError {
+  message: string;
+  status?: number;
+}
+
+export interface AppState {
+  error: ApiError | null;
 }

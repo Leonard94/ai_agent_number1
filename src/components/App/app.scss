@@ -93,7 +93,6 @@
   }
 }
 
-.tldr-card,
 .todo-card,
 .questions-card,
 .chat-card,
@@ -125,15 +124,6 @@
     &.primary {
       color: #1890ff;
     }
-  }
-}
-
-.tldr-card {
-  .tldr-content {
-    margin: 0;
-    color: #ffffff;
-    font-size: 15px;
-    line-height: 1.6;
   }
 }
 
@@ -354,28 +344,26 @@
   }
 }
 
-// Instructions
 .instructions-card {
-  .instruction-item {
-    padding: 8px 0;
-    border: none;
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
+  // .instruction-item {
+  //   padding: 8px 0;
+  //   border: none;
+  //   display: flex;
+  //   align-items: flex-start;
+  //   gap: 8px;
 
-    .instruction-number {
-      color: #1890ff;
-      font-weight: 600;
-      min-width: 20px;
-    }
+  //   .instruction-number {
+  //     color: #1890ff;
+  //     font-weight: 600;
+  //     min-width: 20px;
+  //   }
 
-    .warning-text {
-      color: #faad14;
-    }
-  }
+  //   .warning-text {
+  //     color: #faad14;
+  //   }
+  // }
 }
 
-// Responsive
 @media (max-width: 768px) {
   .app-header {
     .header-content {
@@ -410,6 +398,100 @@
           }
         }
       }
+    }
+  }
+}
+
+// Добавить в App.scss
+
+// Analysis Summary Card
+.analysis-summary-card {
+  background: linear-gradient(135deg, #1f4037 0%, #99f2c8 100%);
+  border: none;
+
+  .ant-card-body {
+    padding: 20px;
+  }
+
+  .summary-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .summary-icon {
+      font-size: 20px;
+      color: #ffffff;
+    }
+
+    .summary-title {
+      margin: 0 !important;
+      color: #ffffff !important;
+      font-size: 18px;
+    }
+  }
+
+  .summary-description {
+    margin: 0 !important;
+    color: #ffffff !important;
+    font-size: 15px;
+    line-height: 1.6;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+  }
+
+  .summary-stats {
+    display: flex;
+    justify-content: center;
+
+    .ant-tag {
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: 16px;
+      border: none;
+      color: #ffffff;
+      font-weight: 500;
+
+      &.ant-tag-processing {
+        background: rgba(24, 144, 255, 0.8);
+      }
+
+      &.ant-tag-warning {
+        background: rgba(250, 173, 20, 0.8);
+      }
+
+      .anticon {
+        margin-right: 4px;
+      }
+    }
+  }
+
+  .summary-hint {
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-size: 13px;
+    text-align: center;
+    font-style: italic;
+  }
+}
+
+@media (max-width: 768px) {
+  .analysis-summary-card {
+    .summary-header {
+      .summary-title {
+        font-size: 16px;
+      }
+    }
+
+    .summary-description {
+      font-size: 14px;
+    }
+
+    .summary-stats {
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
     }
   }
 }

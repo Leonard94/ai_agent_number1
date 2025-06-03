@@ -2,15 +2,16 @@ import type { RequirementAnalysis } from "../types";
 
 export const parseTldr = (response: string): string => {
   const tldrMatch = response.match(
-    /### 1\. T[LS];?DR[\s\S]*?\n\n([\s\S]*?)(?=---|### 2\.|$)/i
+    /\*\*TL;?DR:\*\*\s*\n?([\s\S]*?)(?=\n\*\*TODO:\*\*|\n\*\*ВОПРОСЫ:\*\*|$)/i
   );
 
-  return tldrMatch?.[1]?.trim() || "Не удалось извлечь краткое описание";
+  const tldr = tldrMatch?.[1]?.trim();
+  return tldr || "Не удалось извлечь краткое описание";
 };
 
 export const parseTodoList = (response: string): string[] => {
   const todoSectionMatch = response.match(
-    /### 2\. Чеклист технических действий[\s\S]*?\n\n([\s\S]*?)(?=---|### 3\.|$)/i
+    /\*\*TODO:\*\*\s*\n?([\s\S]*?)(?=\n\*\*ВОПРОСЫ:\*\*|$)/i
   );
 
   if (!todoSectionMatch) {
@@ -21,7 +22,7 @@ export const parseTodoList = (response: string): string[] => {
   const todoList = todoText
     .split(/\n/)
     .map((line) => line.trim())
-    .filter((line) => line.startsWith("- ") && !line.startsWith("- **"))
+    .filter((line) => line.startsWith("- "))
     .map((line) => line.replace(/^- /, ""))
     .filter(Boolean);
 
@@ -32,7 +33,7 @@ export const parseTodoList = (response: string): string[] => {
 
 export const parseQuestions = (response: string): string[] => {
   const questionsSectionMatch = response.match(
-    /### 3\. Вопросы[\s\S]*?\n\n([\s\S]*?)$/i
+    /\*\*ВОПРОСЫ:\*\*\s*\n?([\s\S]*?)$/i
   );
 
   if (!questionsSectionMatch) {

@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { Layout, Row, Col, Space, ConfigProvider, theme } from "antd";
-import { SYSTEM_PROMPT } from "../../constants";
 import { AppHeader } from "../Header/Header";
 import { RequirementInput } from "../RequirementInput/RequirementInput";
 import "./App.scss";
 import type { ChatMessage, RequirementAnalysis } from "../../types";
-import { TldrCard } from "../AnalysisResults/TldrCard/TldrCard";
 import { TodoCard } from "../AnalysisResults/TodoCard/TodoCard";
 import { QuestionsCard } from "../AnalysisResults/QuestionsCard/QuestionsCard";
 import { Chat } from "../Chat/Chat";
 import { Instructions } from "../Instructions/Instructions";
+import { AnalysisSummary } from "../AnalysisSummary/AnalysisSummary";
+import { gigachatApi } from "../../services/gigachatApi";
 
 const { Content } = Layout;
 
@@ -26,37 +26,19 @@ export const App: React.FC = () => {
 
     setIsAnalyzing(true);
 
-    console.log("=== ОТПРАВКА В GIGACHAT API ===");
-    console.log("Системный промпт:", SYSTEM_PROMPT);
-    console.log("Пользовательское требование:", requirement);
-    console.log("================================");
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    const mockAnalysis: RequirementAnalysis = {
-      tldr: "Создание компонента формы регистрации пользователя с валидацией полей email и пароля, интеграцией с Redux для управления состоянием авторизации.",
-      todoList: [
-        "Создать компонент RegistrationForm с TypeScript типами",
-        "Настроить Redux slice для управления состоянием авторизации",
-        "Добавить валидацию email с регулярными выражениями",
-        "Реализовать валидацию пароля (минимум 8 символов, спецсимволы)",
-        "Создать async thunk для отправки данных на сервер",
-        "Добавить обработку ошибок и loading состояний",
-        "Написать unit тесты для формы",
-        "Добавить accessibility атрибуты (ARIA)",
-      ],
-      questions: [
-        "Какие именно поля кроме email и пароля нужны в форме?",
-        "Нужно ли подтверждение пароля?",
-        "Какая именно валидация требуется для пароля?",
-        "Нужна ли интеграция с социальными сетями?",
-        "Какой UI библиотеки использовать (Material-UI, Ant Design, custom)?",
-        "Нужно ли сохранение данных в localStorage?",
-      ],
-    };
-
-    setAnalysis(mockAnalysis);
-    setIsAnalyzing(false);
+    try {
+      const analysis = await gigachatApi.analyzeRequirement(requirement);
+      setAnalysis(analysis);
+    } catch (error) {
+      console.error("Ошибка анализа требования:", error);
+      setAnalysis({
+        tldr: "Не удалось выполнить анализ требования. Пожалуйста, попробуйте позже.",
+        todoList: [],
+        questions: [],
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const sendChatMessage = async () => {
@@ -83,7 +65,7 @@ export const App: React.FC = () => {
       role: "assistant",
       content: `Понял ваш вопрос по требованию. Вот мой ответ на "${currentMessage}": 
 
-Это типичная задача для React разработчика. Рекомендую начать с создания типов TypeScript для формы, затем настроить Redux Toolkit slice. 
+Это типичная задача для React разработчика. Рекомендую начать с создания типов TypeScript для состояния, затем настроить Redux Toolkit slice. 
 
 Нужны ли дополнительные уточнения по реализации?`,
       timestamp: new Date(),
@@ -139,7 +121,11 @@ export const App: React.FC = () => {
                     size="large"
                     className="analysis-cards"
                   >
-                    <TldrCard tldr={analysis.tldr} />
+                    <AnalysisSummary
+                      tldr={analysis.tldr}
+                      todoCount={analysis.todoList.length}
+                      questionsCount={analysis.questions.length}
+                    />
                     <TodoCard todoList={analysis.todoList} />
                     <QuestionsCard questions={analysis.questions} />
                   </Space>
@@ -158,7 +144,7 @@ export const App: React.FC = () => {
               </Row>
             )}
 
-            <Instructions />
+            {!analysis && <Instructions />}
           </div>
         </Content>
       </Layout>

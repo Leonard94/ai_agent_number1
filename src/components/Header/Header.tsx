@@ -16,8 +16,8 @@ export const AppHeader: React.FC = () => {
           </Title>
         </div>
         <Paragraph className="header-description">
-          Преобразование бизнес-требований в технические задачи для React
-          разработчиков
+          Преобразование бизнес и функциональных-требований в технические задачи
+          для разработчиков
         </Paragraph>
       </div>
     </Header>
